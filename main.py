@@ -1,44 +1,43 @@
-from core import HTML
-from renderer import Renderer
 from pathlib import Path
 
+from src.core import HTML
+from src.renderer import Renderer
+from src.tags import head, meta, script, title
 
-def example():
-    html_path = Path(__name__).parent.resolve() / 'index.html'
-    bootstrap_href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css'
+
+def example() -> Renderer:
+    brython_paths = [
+        "brython_source/brython.js",
+        "brython_source/brython_stdlib.js",
+    ]
 
     html = HTML()
-    head = html.head()
-    body = html.body(**{'class': 'container'})
 
-    head.meta(charset='UTF-8')
-    head.link(
-        href=bootstrap_href,
-        rel='stylesheet',
-    )
-    head.title().text(text='Aboba')
+    # Первый вариант использования(через контекстный менеджер)
+    with html:
+        with head():
+            meta(attrs={'charset': 'UTF-8'})
+            title().text(attrs={'text': 'Aboba'})
+            for brython_path in brython_paths:
+                script(attrs={'type': 'text/javascript', 'src': brython_path})
 
-    form = body.div(**{'class': 'row justify-content-center'}).form(**{'class': 'col-4'})
-    with form:
-        username = HTML('div', **{'class': 'form-group'})
-        username.label(**{'name': 'username'}).text(text='Username')
-        username.input(**{'id': 'username', 'name': 'username', 'class': 'form-control'})
+    # Второй вариант использования
+    body = html.body(attrs={'class': 'container', 'onload': 'brython()', 'style': 'height: 100vh;'})
+    body.div(attrs={'style': 'background-color: red; height: 30%;'})
+    body.div(attrs={'style': 'background-color: green; height: 30%;'})
+    body.div(attrs={'style': 'background-color: blue; height: 30%;'})
+    body.pyscript('brython_scripts.hello') # на странице исполнится код из ./brython_scripts/hello.py
 
-        password = HTML('div', **{'class': 'form-group'})
-        password.label(**{'name': 'password'}).text(text='Password')
-        password.input(**{'name': 'password', 'type': 'password', 'class': 'form-control'})
-
-        HTML('button', **{'type': 'submit', 'class': 'btn btn-primary'}).text(text='Login')
-
-    with open(html_path, 'w') as file_:
-        renderer = Renderer(html)
-        file_.write(renderer.render())
-
-    return html_path
+    return Renderer(html)
 
 
 if __name__ == "__main__":
-    html_path = example()
+    renderer = example()
+    html_path = Path(__name__).parent.resolve() / 'index.html'
+    html_text = renderer.render()
+
+    with open(html_path, 'w') as f:
+        f.write(html_text)
 
     import webbrowser
-    webbrowser.open_new_tab(f'file://{html_path}')
+    webbrowser.open_new(f'file://{html_path}')

@@ -1,31 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <meta charset="UTF-8">
     <title>
       Aboba
     </title>
+    <script type="text/javascript" src="brython_source/brython.js">
+    </script>
+    <script type="text/javascript" src="brython_source/brython_stdlib.js">
+    </script>
+
   </head>
-  <body class="container">
-    <div class="row justify-content-center">
-      <form class="col-4">
-        <div class="form-group">
-          <label name="username">
-            Username
-          </label>
-          <input class="form-control" id="username" name="username"/>
-        </div>
-        <div class="form-group">
-          <label name="password">
-            Password
-          </label>
-          <input class="form-control" name="password" type="password"/>
-        </div>
-        <button class="btn btn-primary" type="submit">
-          Login
-        </button>
-      </form>
+  <body class="container" onload="brython()" style="height: 100vh;">
+    <div style="background-color: red; height: 30%;">
     </div>
+    <div style="background-color: green; height: 30%;">
+    </div>
+    <div style="background-color: blue; height: 30%;">
+    </div>
+    <script type="text/python">
+      from browser import document
+      
+      for div in document.select('div'):
+          div.attach('Hello !')
+    </script>
+
   </body>
+
 </html>
