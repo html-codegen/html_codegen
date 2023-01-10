@@ -1,43 +1,33 @@
-from pathlib import Path
-
-from src.core import HTML
-from src.renderer import Renderer
-from src.tags import head, meta, script, title
+from html_codegen.tags import head, html, link, meta, style, title
 
 
-def example() -> Renderer:
-    brython_paths = [
-        "brython_source/brython.js",
-        "brython_source/brython_stdlib.js",
-    ]
-
-    html = HTML()
+def example() -> html:
+    html_document = html(use_brython=True)
 
     # Первый вариант использования(через контекстный менеджер)
-    with html:
+    with html_document:
         with head():
             meta(attrs={'charset': 'UTF-8'})
-            title().text(attrs={'text': 'Aboba'})
-            for brython_path in brython_paths:
-                script(attrs={'type': 'text/javascript', 'src': brython_path})
+            title('Aboba')
+            link('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css', rel='stylesheet')
+
+            style('./web/styles/main.css')
+            # А можно так подключить стили, и кода в исходном html будет меньше
+            # link('./web/styles/main.css', rel='stylesheet')
 
     # Второй вариант использования
-    body = html.body(attrs={'class': 'container', 'onload': 'brython()', 'style': 'height: 100vh;'})
-    body.div(attrs={'style': 'background-color: red; height: 30%;'})
-    body.div(attrs={'style': 'background-color: green; height: 30%;'})
-    body.div(attrs={'style': 'background-color: blue; height: 30%;'})
-    body.pyscript('brython_scripts.hello') # на странице исполнится код из ./brython_scripts/hello.py
+    body = html_document.body()
+    body.div(attrs={'id': 'red'})
+    body.div(attrs={'id': 'green'}).button().text('button')
+    body.div(attrs={'id': 'blue'})
+    body.pyscript('web.scripts.py.hello') # на странице исполнится код из ./web/scripts/py/hello.py
 
-    return Renderer(html)
+    return html_document
 
 
-if __name__ == "__main__":
-    renderer = example()
-    html_path = Path(__name__).parent.resolve() / 'index.html'
-    html_text = renderer.render()
-
-    with open(html_path, 'w') as f:
-        f.write(html_text)
+if __name__ == '__main__':
+    html_document = example()
+    html_path = html_document.save('index.html')
 
     import webbrowser
     webbrowser.open_new(f'file://{html_path}')
