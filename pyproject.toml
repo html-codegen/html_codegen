@@ -6,7 +6,7 @@ authors = ["AndrewBalakirev <balakirev.andrei.it@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-bs4 = "^0.0.1"
+brython = "^3.11.0"
 
 [tool.poetry.dev-dependencies]
 
