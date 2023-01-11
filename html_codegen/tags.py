@@ -16,6 +16,14 @@ class text(HTML):
         return self._attrs["text"]
 
 
+class _OnlyTextTagMixin:
+    tag_name: str
+
+    def add_node_validation(self, new_node: 'HTML') -> None:
+        if not new_node.is_text:
+            raise Exception(f'Тег "{self.tag_name}" может содержать только текст')
+
+
 class _Tag(HTML):
     def __init__(self, attrs: Optional[dict] = None) -> None:
         super().__init__(self.__class__.__name__, attrs)
@@ -47,13 +55,13 @@ class body(_Tag):
             self._attrs['onload'] = 'brython()'
 
 
-class title(_Tag):
+class title(_OnlyTextTagMixin, _Tag):
     def __init__(self, text: str, /) -> None:
         super().__init__()
         self.text(text)
 
 
-class style(_Tag):
+class style(_OnlyTextTagMixin, _Tag):
     def __init__(self, style_path: str, *, media: Optional[str] = None, style_type: Optional[str] = None) -> None:
         attrs = {}
         if media:
@@ -62,11 +70,23 @@ class style(_Tag):
             attrs['type'] = style_type
         super().__init__(attrs)
 
-        self.text(self._get_style_code(style_path))
+        self.text(self._get_code(style_path))
 
-    def _get_style_code(self, style_path: str) -> str:
-        with open(Path(style_path), 'r') as style_file:
-            return style_file.read().strip()
+    def _get_code(self, path: str) -> str:
+        with open(Path(path), 'r') as file:
+            return file.read().strip()
+
+
+class script(_OnlyTextTagMixin, _Tag):
+    def __init__(self, script_path: Optional[str] = None, **kwargs) -> None:
+        super().__init__(kwargs)
+
+        if script_path:
+            self.text(self._get_code(script_path))
+
+    def _get_code(self, path: str) -> str:
+        with open(Path(path), 'r') as file:
+            return file.read().strip()
 
 
 class nav(_Tag):
@@ -193,11 +213,7 @@ class span(_Tag):
     pass
 
 
-class script(_Tag):
-    pass
-
-
-class pyscript(_Tag):
+class pyscript(_OnlyTextTagMixin, _Tag):
     def __init__(self, module: str, /, **kwargs):
         attrs = kwargs.get('attrs', {})
         attrs['type'] = 'text/python'
@@ -232,7 +248,7 @@ class _SingleTag(_Tag):
         self.is_single = True
         
     def add_node_validation(self, *args) -> None:
-        raise Exception('Одиночный тег не может иметь вложеных тегов')
+        raise Exception(f'Одиночный тег "{self.tag_name}" не может иметь вложеных тегов')
 
 
 class link(_SingleTag):
