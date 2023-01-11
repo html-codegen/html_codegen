@@ -69,6 +69,134 @@ class style(_Tag):
             return style_file.read().strip()
 
 
+class nav(_Tag):
+    pass
+
+
+class article(_Tag):
+    pass
+
+
+class section(_Tag):
+    pass
+
+
+class header(_Tag):
+    pass
+
+
+class footer(_Tag):
+    pass
+
+
+class div(_Tag):
+    pass
+
+
+class form(_Tag):
+    pass
+
+
+class table(_Tag):
+    pass
+
+
+class thead(_Tag):
+    pass
+
+
+class tbody(_Tag):
+    pass
+
+
+class tfoot(_Tag):
+    pass
+
+
+class td(_Tag):
+    pass
+
+
+class tr(_Tag):
+    pass
+
+
+class th(_Tag):
+    pass
+
+
+class ul(_Tag):
+    pass
+
+
+class ol(_Tag):
+    pass
+
+
+class li(_Tag):
+    pass
+
+
+class h1(_Tag):
+    pass
+
+
+class h2(_Tag):
+    pass
+
+
+class h3(_Tag):
+    pass
+
+
+class h4(_Tag):
+    pass
+
+
+class h5(_Tag):
+    pass
+
+
+class h6(_Tag):
+    pass
+
+
+class a(_Tag):
+    pass
+
+
+class textarea(_Tag):
+    pass
+
+
+class p(_Tag):
+    pass
+
+
+class b(_Tag):
+    pass
+
+
+class i(_Tag):
+    pass
+
+
+class u(_Tag):
+    pass
+
+
+class s(_Tag):
+    pass
+
+
+class span(_Tag):
+    pass
+
+
+class script(_Tag):
+    pass
+
+
 class pyscript(_Tag):
     def __init__(self, module: str, /, **kwargs):
         attrs = kwargs.get('attrs', {})
