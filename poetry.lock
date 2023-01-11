@@ -2,14 +2,14 @@
 name = "brython"
 version = "3.11.0"
 description = "Brython is an implementation of Python 3 running in the browser"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "4b66ed6cbccf9156cbbd8e6d1396c596689b0bf4e7b56f0ba04acdefcf067cf6"
+content-hash = "2abaeaa4089d9c1bc8fa87ee69a865fcf6555a383c83095ad6c4cc4a2ef15a52"
 
 [metadata.files]
 brython = [
