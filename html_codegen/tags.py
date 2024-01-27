@@ -46,7 +46,7 @@ class head(_Tag):
             "https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js",
         ]
         for brython_path in brython_cdn:
-            self.script(attrs={'type': 'text/javascript', 'src': brython_path})
+            self.script(type='text/javascript', src=brython_path)
 
 
 class body(_Tag):
@@ -215,7 +215,7 @@ class span(_Tag):
 
 class pyscript(_OnlyTextTagMixin, _Tag):
     def __init__(self, module: str, /, **kwargs):
-        attrs = kwargs.get('attrs', {})
+        attrs = kwargs.pop('attrs', {})
         attrs['type'] = 'text/python'
         kwargs['attrs'] = attrs
         super(_Tag, self).__init__('script', **kwargs)
