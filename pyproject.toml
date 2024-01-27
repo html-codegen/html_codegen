@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "html-codegen"
+version = "0.1.0"
+description = ""
+authors = ["AndrewBalakirev <balakirev.andrei.it@gmail.com>"]
+readme = "README.md"
+include = ["html_codegen"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+brython = "3.11.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

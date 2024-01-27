@@ -87,6 +87,7 @@ class _Tag(HTML):
     u: type["u"]
     s: type["s"]
     span: type["span"]
+    button: type["button"]
     pyscript: type["pyscript"]
     link: type["link"]
     hr: type["hr"]
@@ -392,6 +393,13 @@ class s(_Tag):
 class span(_Tag):
     """
     This class represents a span tag in HTML. It inherits from the _Tag class.
+    """
+
+    ...
+
+class button(_Tag):
+    """
+    This class represents a button tag in HTML. It inherits from the _Tag class.
     """
 
     ...

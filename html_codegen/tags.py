@@ -366,6 +366,12 @@ class span(_Tag):
     """
 
 
+class button(_Tag):
+    """
+    This class represents a button tag in HTML. It inherits from the _Tag class.
+    """
+
+
 class pyscript(_OnlyTextTagMixin, _Tag):
     """
     This class represents a pyscript tag in HTML. It inherits from the _OnlyTextTagMixin and _Tag classes.
