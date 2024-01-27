@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["AndrewBalakirev <balakirev.andrei.it@gmail.com>"]
 readme = "README.md"
-include = ["html_codegen"]
+packages = [{include = "html_codegen"}, {include = "html_codegen-stubs", from = "typings"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
