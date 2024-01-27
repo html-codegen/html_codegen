@@ -7,27 +7,28 @@ def example() -> html:
     # Первый вариант использования(через контекстный менеджер)
     with html_document:
         with head():
-            meta(attrs={'charset': 'UTF-8'})
-            title('Aboba')
-            link('https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css', rel='stylesheet')
+            meta(attrs={"charset": "UTF-8"})
+            title("Aboba")
+            link("https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css", rel="stylesheet")
 
-            style('./web/styles/main.css')
+            style("./web/styles/main.css")
             # А можно так подключить стили, и кода в исходном html будет меньше
             # link('./web/styles/main.css', rel='stylesheet')
 
     # Второй вариант использования
     body = html_document.body()
-    body.div(attrs={'id': 'red'})
-    body.div(attrs={'id': 'green'}).button().text('button')
-    body.div(attrs={'id': 'blue'})
-    body.pyscript('web.scripts.py.hello') # на странице исполнится код из ./web/scripts/py/hello.py
+    body.div(attrs={"id": "red"})
+    body.div(attrs={"id": "green"}).button().text("button")
+    body.div(attrs={"id": "blue"})
+    body.pyscript("web.scripts.py.hello")  # на странице исполнится код из ./web/scripts/py/hello.py
 
     return html_document
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     html_document = example()
-    html_path = html_document.save('index.html')
+    html_path = html_document.save("index.html")
 
     import webbrowser
-    webbrowser.open_new(f'file://{html_path}')
+
+    webbrowser.open_new(f"file://{html_path}")

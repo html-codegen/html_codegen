@@ -13,9 +13,9 @@
 
 Класс HTML также позволяет динамически создавать дочерние элементы с помощью вызовов методов с названиями тегов.
 """
+import threading
 from collections import defaultdict, namedtuple
 from pathlib import Path
-import threading
 from typing import Callable, Optional
 
 
@@ -35,7 +35,7 @@ class HTMLNode:
         _ctx: Контекст текущего узла.
     """
 
-    frame = namedtuple('frame', ['tag', 'items'])
+    frame = namedtuple("frame", ["tag", "items"])
     _with_contexts = defaultdict(list)
 
     def __init__(self):
@@ -44,10 +44,10 @@ class HTMLNode:
         self._ctx = None
         self._add_to_ctx()
 
-    def __enter__(self) -> 'HTMLNode':
+    def __enter__(self) -> "HTMLNode":
         """
         Метод-контекстный менеджер для создания узла HTML.
-        
+
         Returns:
             HTMLNode: Объект HTML-узла.
         """
@@ -58,7 +58,7 @@ class HTMLNode:
     def __exit__(self, *_) -> None:
         """
         Метод, который вызывается при выходе из контекста создания узла.
-        
+
         Args:
             _: Возвращает ничего.
         """
@@ -66,29 +66,30 @@ class HTMLNode:
         stack = HTMLNode._with_contexts[thread_id]
         frame = stack.pop()
         for item in frame.items:
-            if item.parent: continue
+            if item.parent:
+                continue
             self.add_node(item)
         if not stack:
             del HTMLNode._with_contexts[thread_id]
 
     @property
-    def parent(self) -> Optional['HTMLNode']:
+    def parent(self) -> Optional["HTMLNode"]:
         """
         Getter-метод для получения родительского узла текущего узла HTML.
-        
+
         Returns:
             Optional[HTMLNode]: Родительский узел текущего узла HTML.
         """
         return self._parent
 
     @parent.setter
-    def parent(self, value: 'HTMLNode') -> None:
+    def parent(self, value: "HTMLNode") -> None:
         """
         Setter-метод для установки родительского узла текущего узла HTML.
-        
+
         Args:
             value (HTMLNode): Родительский узел текущего узла HTML.
-        
+
         Returns:
             None
         """
@@ -103,7 +104,7 @@ class HTMLNode:
     def layer(self) -> int:
         """
         Getter-метод для получения уровня текущего узла HTML.
-        
+
         Returns:
             int: Уровень текущего узла HTML.
         """
@@ -118,10 +119,10 @@ class HTMLNode:
         return layer
 
     @property
-    def root(self) -> 'HTMLNode':
+    def root(self) -> "HTMLNode":
         """
         Getter-метод для получения корневого узла текущего узла HTML.
-        
+
         Returns:
             HTMLNode: Корневой узел текущего узла HTML.
         """
@@ -135,25 +136,25 @@ class HTMLNode:
 
         return root
 
-    def add_node_validation(self, new_node: 'HTMLNode') -> None:
+    def add_node_validation(self, new_node: "HTMLNode") -> None:
         """
         Метод для проверки дочернего узла перед добавлением в текущий узел HTML.
-        
+
         Args:
             new_node (HTMLNode): Новый дочерний узел, который нужно проверить.
-        
+
         Returns:
             None
         """
         ...
 
-    def add_node(self, new_node: 'HTMLNode') -> None:
+    def add_node(self, new_node: "HTMLNode") -> None:
         """
         Метод для добавления дочернего узла в текущий узел HTML.
-        
+
         Args:
             new_node (HTMLNode): Новый дочерний узел, который нужно добавить.
-        
+
         Returns:
             None
         """
@@ -164,7 +165,7 @@ class HTMLNode:
     def _add_to_ctx(self) -> None:
         """
         Вспомогательный метод для добавления узла в контекст текущего узла HTML.
-        
+
         Returns:
             None
         """
@@ -188,6 +189,7 @@ class HTML(HTMLNode):
         _nodes (list): список дочерних элементов
 
     """
+
     def __init__(self, tag_name: str, attrs: Optional[dict] = None):
         """
         Инициализирует экземпляр класса HTML.
@@ -203,9 +205,9 @@ class HTML(HTMLNode):
         self.is_text: bool = False
         self._attrs = attrs or {}
 
-        self.parent: 'HTML'
-        self.root: 'HTML'
-        self._nodes: list['HTML']
+        self.parent: "HTML"
+        self.root: "HTML"
+        self._nodes: list["HTML"]
 
     def __repr__(self) -> str:
         """
@@ -216,6 +218,7 @@ class HTML(HTMLNode):
 
         """
         from .renderer import Renderer
+
         return Renderer(self).get_open_tag(self).strip() + Renderer(self).get_close_tag(self).strip()
 
     def __getattr__(self, tag_name: str) -> Callable:
@@ -230,11 +233,12 @@ class HTML(HTMLNode):
 
         """
         from . import tags
+
         tag_class = getattr(tags, tag_name, None)
 
-        def _create_node(*args, **kwargs) -> 'HTML':
+        def _create_node(*args, **kwargs) -> "HTML":
             if tag_class:
-                tag = tag_class(*args,  **kwargs)
+                tag = tag_class(*args, **kwargs)
             else:
                 tag = HTML(tag_name, **kwargs)
 
@@ -242,6 +246,10 @@ class HTML(HTMLNode):
             return tag
 
         return _create_node
+
+    @property
+    def children(self) -> list["HTML"]:
+        return self._nodes
 
     @property
     def in_head(self) -> bool:
@@ -254,7 +262,7 @@ class HTML(HTMLNode):
         """
         parent = self.parent
         while parent:
-            if parent.tag_name == 'head':
+            if parent.tag_name == "head":
                 return True
 
             parent = parent.parent
@@ -272,14 +280,14 @@ class HTML(HTMLNode):
         """
         parent = self.parent
         while parent:
-            if parent.tag_name == 'body':
+            if parent.tag_name == "body":
                 return True
 
             parent = parent.parent
 
         return False
 
-    def add_node_validation(self, new_node: 'HTML') -> None:
+    def add_node_validation(self, new_node: "HTML") -> None:
         """
         Проверяет, может ли новый HTML-элемент быть добавлен как дочерний элемент.
 
@@ -291,7 +299,7 @@ class HTML(HTMLNode):
 
         """
         if new_node.parent:
-            raise Exception('node already has parent')
+            raise Exception("node already has parent")
 
     def save(self, filename: str) -> Path:
         """
@@ -307,9 +315,9 @@ class HTML(HTMLNode):
         from .renderer import Renderer
 
         if not (html_path := Path(filename)).is_absolute():
-            html_path = Path(__name__).parent.resolve() / 'index.html'
+            html_path = Path(__name__).parent.resolve() / "index.html"
 
-        with open(html_path, 'w') as html_file:
+        with open(html_path, "w") as html_file:
             html_file.write(Renderer(self).render())
 
         return html_path

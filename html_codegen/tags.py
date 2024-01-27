@@ -1,3 +1,4 @@
+from operator import attrgetter
 from pathlib import Path
 from typing import Optional
 
@@ -27,6 +28,19 @@ class text(HTML):
 
     def __repr__(self):
         return self._attrs["text"]
+
+
+class _OnlyOneInHTMLTagMixin:
+    tag_name: str
+    parent: HTML
+
+    def parent_setted_callback(self) -> None:
+        if not isinstance(self.parent, html):
+            raise Exception(f'Тег "{self.tag_name}" может находиться только внутри тега "html"')
+
+        parent_children = list(map(attrgetter("tag_name"), self.parent.children))
+        if self.tag_name in parent_children:
+            raise Exception(f'Тег "{self.tag_name}" может быть только один внутри тега "html"')
 
 
 class _OnlyTextTagMixin:
@@ -79,13 +93,14 @@ class html(_Tag):
         super().__init__(**kwargs)
 
 
-class head(_Tag):
+class head(_OnlyOneInHTMLTagMixin, _Tag):
     """
     This class represents the head section of an HTML document. It inherits from the _Tag class.
     """
 
     def parent_setted_callback(self):
-        if isinstance(self.root, html) and self.root.use_brython:
+        super().parent_setted_callback()
+        if self.root.use_brython:
             self._set_brython()
 
     def _set_brython(self):
@@ -97,12 +112,13 @@ class head(_Tag):
             self.script(type="text/javascript", src=brython_path)
 
 
-class body(_Tag):
+class body(_OnlyOneInHTMLTagMixin, _Tag):
     """
     This class represents the body section of an HTML document. It inherits from the _Tag class.
     """
 
     def parent_setted_callback(self):
+        super().parent_setted_callback()
         if isinstance(self.root, html) and self.root.use_brython:
             self._attrs["onload"] = "brython()"
 
@@ -432,9 +448,7 @@ class _SingleTag(_Tag):
         self.is_single = True
 
     def add_node_validation(self, *args) -> None:
-        raise Exception(
-            f'Одиночный тег "{self.tag_name}" не может иметь вложеных тегов'
-        )
+        raise Exception(f'Одиночный тег "{self.tag_name}" не может иметь вложеных тегов')
 
 
 class link(_SingleTag):
