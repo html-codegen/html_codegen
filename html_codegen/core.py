@@ -224,6 +224,9 @@ class HTML(HTMLNode):
     def __getattr__(self, tag_name: str) -> Callable:
         """
         Возвращает функцию, которая создает новый HTML-элемент с указанным именем тега.
+        
+        Для тегов, которые конфликтуют с ключевыми словами Python (input, object, map, del),
+        автоматически ищет версию с подчеркиванием (input_, object_, map_, del_).
 
         Args:
             tag_name (str): имя тега
@@ -234,7 +237,14 @@ class HTML(HTMLNode):
         """
         from . import tags
 
-        tag_class = getattr(tags, tag_name, None)
+        # Список тегов, которые конфликтуют с ключевыми словами Python
+        keyword_conflicts = {'input', 'object', 'map', 'del'}
+        
+        # Если тег конфликтует с ключевым словом, ищем версию с подчеркиванием
+        if tag_name in keyword_conflicts:
+            tag_class = getattr(tags, f"{tag_name}_", None)
+        else:
+            tag_class = getattr(tags, tag_name, None)
 
         def _create_node(*args, **kwargs) -> "HTML":
             if tag_class:
