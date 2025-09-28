@@ -1,5 +1,8 @@
 """
-Теги списков.
+List tags.
+
+This module provides HTML tags for creating various types of lists,
+including ordered lists, unordered lists, and definition lists.
 """
 from .base_ import Tag
 

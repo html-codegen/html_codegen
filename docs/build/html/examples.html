@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Примеры использования &mdash; HTML Codegen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API Reference" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            HTML Codegen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Содержание:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Установка</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Быстрый старт</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Примеры использования</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Базовые примеры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#html">Простая HTML страница</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#css">Страница с CSS стилями</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Продвинутые примеры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Блог с несколькими статьями</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Форма регистрации</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Таблица данных</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">Интерактивные примеры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Простая галерея изображений</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#brython">Интеграция с Brython</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Пример для выполнения в браузере</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id10">Полезные паттерны</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id11">Создание компонентов</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Динамическое создание контента</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">HTML Codegen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Примеры использования</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/examples.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>Примеры использования<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>В этом разделе представлены различные примеры использования HTML Codegen для решения реальных задач.</p>
+<section id="id2">
+<h2>Базовые примеры<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="html">
+<h3>Простая HTML страница<a class="headerlink" href="#html" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">h1</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">doc</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Простая страница&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Добро пожаловать!&quot;</span><span class="p">)</span>
+        <span class="n">div</span><span class="p">()</span><span class="o">.</span><span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Это пример простой HTML страницы.&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="css">
+<h3>Страница с CSS стилями<a class="headerlink" href="#css" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">h1</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">doc</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Страница со стилями&quot;</span><span class="p">)</span>
+        <span class="n">link</span><span class="p">(</span><span class="s2">&quot;styles.css&quot;</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="s2">&quot;stylesheet&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">div</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;container&quot;</span><span class="p">}):</span>
+            <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Стилизованная страница&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">div</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;highlight&quot;</span><span class="p">}):</span>
+                <span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Этот текст выделен стилем.&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id3">
+<h2>Продвинутые примеры<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="id4">
+<h3>Блог с несколькими статьями<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span>
+    <span class="n">header</span><span class="p">,</span> <span class="n">nav</span><span class="p">,</span> <span class="n">main</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">aside</span><span class="p">,</span> <span class="n">footer</span><span class="p">,</span>
+    <span class="n">h1</span><span class="p">,</span> <span class="n">h2</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">ul</span><span class="p">,</span> <span class="n">li</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">time</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">blog</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Мой блог&quot;</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;charset&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">})</span>
+        <span class="n">meta</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;viewport&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;width=device-width, initial-scale=1.0&quot;</span><span class="p">})</span>
+        <span class="n">link</span><span class="p">(</span><span class="s2">&quot;styles.css&quot;</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="s2">&quot;stylesheet&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">header</span><span class="p">():</span>
+            <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Мой блог&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">nav</span><span class="p">():</span>
+                    <span class="k">with</span> <span class="n">ul</span><span class="p">():</span>
+                        <span class="k">with</span> <span class="n">li</span><span class="p">():</span>
+                            <span class="n">a</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Главная&quot;</span><span class="p">)</span>
+                        <span class="k">with</span> <span class="n">li</span><span class="p">():</span>
+                            <span class="n">a</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;/about&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;О нас&quot;</span><span class="p">)</span>
+                        <span class="k">with</span> <span class="n">li</span><span class="p">():</span>
+                            <span class="n">a</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;href&quot;</span><span class="p">:</span> <span class="s2">&quot;/contact&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Контакты&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">main</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">article</span><span class="p">():</span>
+                <span class="n">h2</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Первая статья&quot;</span><span class="p">)</span>
+                <span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Содержание первой статьи...&quot;</span><span class="p">)</span>
+                <span class="n">time</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;datetime&quot;</span><span class="p">:</span> <span class="s2">&quot;2024-01-15&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;2024-01-15&quot;</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">article</span><span class="p">():</span>
+                <span class="n">h2</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Вторая статья&quot;</span><span class="p">)</span>
+                <span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Содержание второй статьи...&quot;</span><span class="p">)</span>
+                <span class="n">time</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;datetime&quot;</span><span class="p">:</span> <span class="s2">&quot;2024-01-20&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;2024-01-20&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">aside</span><span class="p">():</span>
+            <span class="n">h2</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Боковая панель&quot;</span><span class="p">)</span>
+            <span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Дополнительная информация...&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">footer</span><span class="p">():</span>
+            <span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;© 2024 Мой блог. Все права защищены.&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">blog</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3>Форма регистрации<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">fieldset</span><span class="p">,</span> <span class="n">legend</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">,</span> <span class="n">input_</span><span class="p">,</span> <span class="n">select</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">textarea</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">h1</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">registration_form</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Регистрация&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Регистрация нового пользователя&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">form</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;/register&quot;</span><span class="p">}):</span>
+            <span class="k">with</span> <span class="n">fieldset</span><span class="p">():</span>
+                <span class="n">legend</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Личная информация&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">div</span><span class="p">():</span>
+                    <span class="n">label</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;for&quot;</span><span class="p">:</span> <span class="s2">&quot;first_name&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Имя:&quot;</span><span class="p">)</span>
+                    <span class="n">input_</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;first_name&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;first_name&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
+
+                <span class="k">with</span> <span class="n">div</span><span class="p">():</span>
+                    <span class="n">label</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;for&quot;</span><span class="p">:</span> <span class="s2">&quot;last_name&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Фамилия:&quot;</span><span class="p">)</span>
+                    <span class="n">input_</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;last_name&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;last_name&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
+
+                <span class="k">with</span> <span class="n">div</span><span class="p">():</span>
+                    <span class="n">label</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;for&quot;</span><span class="p">:</span> <span class="s2">&quot;email&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Email:&quot;</span><span class="p">)</span>
+                    <span class="n">input_</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
+
+                <span class="k">with</span> <span class="n">div</span><span class="p">():</span>
+                    <span class="n">label</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;for&quot;</span><span class="p">:</span> <span class="s2">&quot;password&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Пароль:&quot;</span><span class="p">)</span>
+                    <span class="n">input_</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
+
+                <span class="k">with</span> <span class="n">div</span><span class="p">():</span>
+                    <span class="n">label</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;for&quot;</span><span class="p">:</span> <span class="s2">&quot;confirm_password&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Подтверждение пароля:&quot;</span><span class="p">)</span>
+                    <span class="n">input_</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;confirm_password&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;confirm_password&quot;</span><span class="p">,</span> <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
+
+            <span class="k">with</span> <span class="n">fieldset</span><span class="p">():</span>
+                <span class="n">legend</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Дополнительная информация&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">div</span><span class="p">():</span>
+                    <span class="n">label</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;for&quot;</span><span class="p">:</span> <span class="s2">&quot;country&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Страна:&quot;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="n">select</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;country&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;country&quot;</span><span class="p">}):</span>
+                        <span class="n">option</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Выберите страну&quot;</span><span class="p">)</span>
+                        <span class="n">option</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;ru&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Россия&quot;</span><span class="p">)</span>
+                        <span class="n">option</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;us&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;США&quot;</span><span class="p">)</span>
+                        <span class="n">option</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;de&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Германия&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">div</span><span class="p">():</span>
+                    <span class="n">label</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;for&quot;</span><span class="p">:</span> <span class="s2">&quot;bio&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;О себе:&quot;</span><span class="p">)</span>
+                    <span class="n">textarea</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;bio&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;bio&quot;</span><span class="p">,</span> <span class="s2">&quot;rows&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span> <span class="s2">&quot;cols&quot;</span><span class="p">:</span> <span class="s2">&quot;50&quot;</span><span class="p">})</span>
+
+            <span class="n">button</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;submit&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Зарегистрироваться&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">registration_form</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h3>Таблица данных<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">thead</span><span class="p">,</span> <span class="n">tbody</span><span class="p">,</span> <span class="n">tfoot</span><span class="p">,</span>
+    <span class="n">tr</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="n">td</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">div</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">data_table</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Таблица данных&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Отчет по продажам&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">div</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;table-container&quot;</span><span class="p">}):</span>
+            <span class="k">with</span> <span class="n">table</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;border&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;cellpadding&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span> <span class="s2">&quot;cellspacing&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">}):</span>
+                <span class="n">caption</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Продажи по месяцам&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">thead</span><span class="p">():</span>
+                    <span class="k">with</span> <span class="n">tr</span><span class="p">():</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Месяц&quot;</span><span class="p">)</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Продажи&quot;</span><span class="p">)</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Прибыль&quot;</span><span class="p">)</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Рост&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">tbody</span><span class="p">():</span>
+                    <span class="k">with</span> <span class="n">tr</span><span class="p">():</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Январь&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;100,000&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;20,000&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;+5%&quot;</span><span class="p">)</span>
+
+                    <span class="k">with</span> <span class="n">tr</span><span class="p">():</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Февраль&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;120,000&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;25,000&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;+8%&quot;</span><span class="p">)</span>
+
+                    <span class="k">with</span> <span class="n">tr</span><span class="p">():</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Март&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;110,000&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;22,000&quot;</span><span class="p">)</span>
+                        <span class="n">td</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;+3%&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">tfoot</span><span class="p">():</span>
+                    <span class="k">with</span> <span class="n">tr</span><span class="p">():</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Итого&quot;</span><span class="p">)</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;330,000&quot;</span><span class="p">)</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;67,000&quot;</span><span class="p">)</span>
+                        <span class="n">th</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;+5.3%&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">data_table</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id7">
+<h2>Интерактивные примеры<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<section id="id8">
+<h3>Простая галерея изображений<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span>
+    <span class="n">script</span><span class="p">,</span> <span class="n">link</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">gallery</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Галерея изображений&quot;</span><span class="p">)</span>
+        <span class="n">link</span><span class="p">(</span><span class="s2">&quot;gallery.css&quot;</span><span class="p">,</span> <span class="n">rel</span><span class="o">=</span><span class="s2">&quot;stylesheet&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Моя галерея&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">div</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;gallery&quot;</span><span class="p">}):</span>
+            <span class="n">img</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;image1.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">:</span> <span class="s2">&quot;Изображение 1&quot;</span><span class="p">,</span> <span class="s2">&quot;onclick&quot;</span><span class="p">:</span> <span class="s2">&quot;openModal(this)&quot;</span><span class="p">})</span>
+            <span class="n">img</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;image2.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">:</span> <span class="s2">&quot;Изображение 2&quot;</span><span class="p">,</span> <span class="s2">&quot;onclick&quot;</span><span class="p">:</span> <span class="s2">&quot;openModal(this)&quot;</span><span class="p">})</span>
+            <span class="n">img</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;image3.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">:</span> <span class="s2">&quot;Изображение 3&quot;</span><span class="p">,</span> <span class="s2">&quot;onclick&quot;</span><span class="p">:</span> <span class="s2">&quot;openModal(this)&quot;</span><span class="p">})</span>
+
+        <span class="n">script</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="s2">&quot;gallery.js&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">gallery</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="brython">
+<h2>Интеграция с Brython<a class="headerlink" href="#brython" title="Link to this heading"></a></h2>
+<section id="id9">
+<h3>Пример для выполнения в браузере<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">pyscript</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">h1</span>
+
+
+<span class="k">with</span> <span class="n">html</span><span class="p">(</span><span class="n">use_brython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">brython_app</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">()</span> <span class="k">as</span> <span class="n">head_tag</span><span class="p">:</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Brython приложение&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">body</span><span class="p">()</span> <span class="k">as</span> <span class="n">body_tag</span><span class="p">:</span>
+        <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Интерактивное приложение&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">div</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">}):</span>
+            <span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Нажмите кнопку для взаимодействия&quot;</span><span class="p">)</span>
+            <span class="n">button</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;btn&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Кликни меня&quot;</span><span class="p">)</span>
+            <span class="n">p</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;result&quot;</span><span class="p">})</span>
+
+        <span class="n">pyscript</span><span class="p">(</span><span class="s2">&quot;brython_app&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">brython_app</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id10">
+<h2>Полезные паттерны<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<section id="id11">
+<h3>Создание компонентов<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_card</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">image_url</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Создает карточку с заголовком и содержимым.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="n">div</span><span class="p">,</span> <span class="n">h3</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">img</span>
+
+    <span class="k">with</span> <span class="n">div</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;card&quot;</span><span class="p">}):</span>
+        <span class="k">if</span> <span class="n">image_url</span><span class="p">:</span>
+            <span class="n">img</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="n">image_url</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;card-image&quot;</span><span class="p">})</span>
+        <span class="n">h3</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;card-title&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">p</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;card-content&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+<span class="c1"># Использование компонента</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">h1</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">cards_page</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Карточки&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Наши услуги&quot;</span><span class="p">)</span>
+
+        <span class="n">create_card</span><span class="p">(</span><span class="s2">&quot;Веб-разработка&quot;</span><span class="p">,</span> <span class="s2">&quot;Создание современных веб-сайтов&quot;</span><span class="p">,</span> <span class="s2">&quot;web.jpg&quot;</span><span class="p">)</span>
+        <span class="n">create_card</span><span class="p">(</span><span class="s2">&quot;Мобильные приложения&quot;</span><span class="p">,</span> <span class="s2">&quot;Разработка iOS и Android приложений&quot;</span><span class="p">,</span> <span class="s2">&quot;mobile.jpg&quot;</span><span class="p">)</span>
+        <span class="n">create_card</span><span class="p">(</span><span class="s2">&quot;Консультации&quot;</span><span class="p">,</span> <span class="s2">&quot;Технические консультации и аудит&quot;</span><span class="p">,</span> <span class="s2">&quot;consulting.jpg&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">cards_page</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="id12">
+<h3>Динамическое создание контента<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">create_navigation_menu</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Создает навигационное меню из списка элементов.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="n">nav</span><span class="p">,</span> <span class="n">ul</span><span class="p">,</span> <span class="n">li</span><span class="p">,</span> <span class="n">a</span>
+
+    <span class="k">with</span> <span class="n">nav</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;main-nav&quot;</span><span class="p">}):</span>
+        <span class="k">with</span> <span class="n">ul</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">li</span><span class="p">():</span>
+                    <span class="n">a</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;href&quot;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]})</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+
+<span class="c1"># Использование</span>
+<span class="n">menu_items</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Главная&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;О нас&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;/about&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Услуги&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;/services&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Контакты&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;/contact&quot;</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.tags</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">h1</span><span class="p">,</span> <span class="n">p</span>
+
+<span class="k">with</span> <span class="n">html</span><span class="p">()</span> <span class="k">as</span> <span class="n">nav_page</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">head</span><span class="p">():</span>
+        <span class="n">title</span><span class="p">(</span><span class="s2">&quot;Страница с навигацией&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">body</span><span class="p">():</span>
+        <span class="n">create_navigation_menu</span><span class="p">(</span><span class="n">menu_items</span><span class="p">)</span>
+        <span class="n">h1</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Контент страницы&quot;</span><span class="p">)</span>
+        <span class="n">p</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;Основное содержимое...&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">html_codegen.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="n">nav_page</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, HTML CodegenTeam.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

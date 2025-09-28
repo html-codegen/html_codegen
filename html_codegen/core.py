@@ -1,17 +1,18 @@
 """
-Этот модуль содержит классы HTMLNode и HTML для создания иерархии узлов HTML-документа.
-Класс HTMLNode представляет узел дерева, а HTML - элемент HTML-документа, наследуемый от HTMLNode.
-В коде есть методы для добавления узлов, определения родительского элемента и корня,
-а также сохранения HTML-документа в файл.
+Core HTML node classes for creating hierarchical HTML document structures.
 
-Класс HTMLNode также реализует контекстный менеджер, который создает блоки кода с помощью оператора with.
-Когда создается экземпляр HTMLNode внутри блока with, он добавляется в стек контекста текущего потока выполнения.
-При выходе из блока with все элементы текущего контекста удаляются из стека
-и добавляются как дочерние элементы к текущему экземпляру HTMLNode, если у них нет родительского элемента.
-Контекстный менеджер HTMLNode позволяет создавать иерархическую структуру элементов
-в HTML-документе с помощью блоков with.
+This module contains the HTMLNode and HTML classes for building HTML document trees.
+HTMLNode represents a tree node, while HTML is an HTML element that inherits from HTMLNode.
+The code includes methods for adding nodes, determining parent elements and root,
+as well as saving HTML documents to files.
 
-Класс HTML также позволяет динамически создавать дочерние элементы с помощью вызовов методов с названиями тегов.
+The HTMLNode class also implements a context manager that creates code blocks using the with operator.
+When an HTMLNode instance is created inside a with block, it is added to the context stack
+of the current execution context. When exiting the with block, all elements of the current context
+are added as child elements to the current HTMLNode instance if they don't have a parent element. 
+The HTMLNode context manager allows creating hierarchical element structures in HTML documents using with blocks.
+
+The HTML class also allows dynamic creation of child elements through method calls with tag names.
 """
 import threading
 from collections import defaultdict, namedtuple
@@ -27,86 +28,162 @@ def _get_thread_context():
 
 class HTMLNode:
     """
-    HTMLNode - базовый класс для всех узлов HTML-дерева.
+    HTMLNode - base class for all HTML tree nodes.
+
+    This class provides the fundamental structure for building hierarchical HTML documents.
+    It supports context management for clean code organization and thread-safe operations.
 
     Attributes:
-        _parent (Optional[HTMLNode]): Родительский узел текущего узла HTML.
-        _nodes (list[HTMLNode]): Список дочерних узлов текущего узла HTML.
-        _ctx: Контекст текущего узла.
+        _parent (Optional[HTMLNode]): Parent node of the current HTML node.
+        _nodes (list[HTMLNode]): List of child nodes of the current HTML node.
     """
 
     frame = namedtuple("frame", ["tag", "items"])
     _with_contexts = defaultdict(list)
+    _pending_callbacks = defaultdict(list)  # thread_id -> list of callbacks
 
     def __init__(self):
         self._parent: Optional[HTMLNode] = None
         self._nodes: list[HTMLNode] = []
         self._ctx = None
+        self._created_in_with_context = False
         self._add_to_ctx()
 
     def __enter__(self) -> "HTMLNode":
         """
-        Метод-контекстный менеджер для создания узла HTML.
+        Context manager method for creating HTML nodes.
 
         Returns:
-            HTMLNode: Объект HTML-узла.
+            HTMLNode: HTML node object.
         """
         stack = HTMLNode._with_contexts[_get_thread_context()]
         stack.append(HTMLNode.frame(self, []))
         return self
 
     def __exit__(self, *_) -> None:
-        """
-        Метод, который вызывается при выходе из контекста создания узла.
-
-        Args:
-            _: Возвращает ничего.
-        """
         thread_id = _get_thread_context()
         stack = HTMLNode._with_contexts[thread_id]
         frame = stack.pop()
+        
+        # Сначала устанавливаем всех родителей
         for item in frame.items:
             if item.parent:
                 continue
             self.add_node(item)
+        
+        # Затем выполняем все отложенные колбэки
+        HTMLNode._execute_pending_callbacks(thread_id)
+        
         if not stack:
             del HTMLNode._with_contexts[thread_id]
 
     @property
     def parent(self) -> Optional["HTMLNode"]:
         """
-        Getter-метод для получения родительского узла текущего узла HTML.
+        Getter method for obtaining the parent node of the current HTML node.
 
         Returns:
-            Optional[HTMLNode]: Родительский узел текущего узла HTML.
+            Optional[HTMLNode]: Parent node of the current HTML node.
         """
         return self._parent
 
     @parent.setter
     def parent(self, value: "HTMLNode") -> None:
         """
-        Setter-метод для установки родительского узла текущего узла HTML.
+        Setter method for setting the parent node of the current HTML node.
 
         Args:
-            value (HTMLNode): Родительский узел текущего узла HTML.
+            value (HTMLNode): Parent node of the current HTML node.
 
         Returns:
             None
         """
         self._parent = value
-
         self.parent_setted_callback()
 
     def parent_setted_callback(self):
-        ...
+        """
+        Callback method called when parent is set.
+        
+        If the node was created in a with context, the callback is deferred
+        until the with block exits. Otherwise, it's executed immediately.
+        """
+        if self._created_in_with_context:
+            # Отложить выполнение колбэка до выхода из with блока
+            self._schedule_deferred_callback()
+        else:
+            # Выполнить колбэк немедленно
+            self._execute_parent_callback()
+    
+    def _schedule_deferred_callback(self):
+        """Schedule a deferred callback for execution after with block exits."""
+        thread_id = _get_thread_context()
+        HTMLNode._pending_callbacks[thread_id].append(self._execute_parent_callback)
+    
+    def _execute_parent_callback(self):
+        """
+        Execute the actual parent callback logic.
+        
+        Override this method in subclasses to implement specific callback behavior.
+        """
+        pass
+    
+    @classmethod
+    def _execute_pending_callbacks(cls, thread_id: int) -> None:
+        """
+        Execute all pending callbacks for the given thread.
+        
+        Args:
+            thread_id (int): Thread identifier
+        """
+        callbacks = cls._pending_callbacks.get(thread_id, [])
+        for callback in callbacks:
+            try:
+                callback()
+            except Exception as e:
+                # Логируем ошибку, но не прерываем выполнение других колбэков
+                print(f"Error executing deferred callback: {e}")
+        
+        # Очищаем очередь колбэков для этого потока
+        cls._pending_callbacks[thread_id].clear()
+    
+    @staticmethod
+    def _get_thread_context():
+        """Возвращает идентификатор текущего потока."""
+        return _get_thread_context()
+    
+    def _find_html_tag(self):
+        """
+        Найти html тег в иерархии родителей или в контексте with блоков.
+        
+        Returns:
+            html: HTML тег или None, если не найден
+        """
+        from .tags.document_ import html
+        
+        # Сначала ищем в иерархии родителей
+        current = self.parent
+        while current:
+            if isinstance(current, html):
+                return current
+            current = current.parent
+        
+        # Если не нашли в родителях, ищем в контексте with
+        thread_id = self._get_thread_context()
+        stack = self._with_contexts.get(thread_id, [])
+        for frame in stack:
+            if isinstance(frame.tag, html):
+                return frame.tag
+        
+        return None
 
     @property
     def layer(self) -> int:
         """
-        Getter-метод для получения уровня текущего узла HTML.
+        Getter method for obtaining the level of the current HTML node.
 
         Returns:
-            int: Уровень текущего узла HTML.
+            int: Level of the current HTML node.
         """
         parent = self.parent
         layer = 0
@@ -121,10 +198,10 @@ class HTMLNode:
     @property
     def root(self) -> "HTMLNode":
         """
-        Getter-метод для получения корневого узла текущего узла HTML.
+        Getter method for obtaining the root node of the current HTML node.
 
         Returns:
-            HTMLNode: Корневой узел текущего узла HTML.
+            HTMLNode: Root node of the current HTML node.
         """
         parent = self.parent
         root = self
@@ -138,10 +215,10 @@ class HTMLNode:
 
     def add_node_validation(self, new_node: "HTMLNode") -> None:
         """
-        Метод для проверки дочернего узла перед добавлением в текущий узел HTML.
+        Method for validating a child node before adding it to the current HTML node.
 
         Args:
-            new_node (HTMLNode): Новый дочерний узел, который нужно проверить.
+            new_node (HTMLNode): New child node to validate.
 
         Returns:
             None
@@ -150,10 +227,10 @@ class HTMLNode:
 
     def add_node(self, new_node: "HTMLNode") -> None:
         """
-        Метод для добавления дочернего узла в текущий узел HTML.
+        Method for adding a child node to the current HTML node.
 
         Args:
-            new_node (HTMLNode): Новый дочерний узел, который нужно добавить.
+            new_node (HTMLNode): New child node to add.
 
         Returns:
             None
@@ -164,7 +241,7 @@ class HTMLNode:
 
     def _add_to_ctx(self) -> None:
         """
-        Вспомогательный метод для добавления узла в контекст текущего узла HTML.
+        Helper method for adding a node to the current context.
 
         Returns:
             None
@@ -173,30 +250,34 @@ class HTMLNode:
         if stack:
             self._ctx = stack[-1]
             stack[-1].items.append(self)
+            self._created_in_with_context = True
 
 
 class HTML(HTMLNode):
     """
-    HTML - класс, представляющий HTML-элемент.
+    HTML - class representing an HTML element.
+
+    This class extends HTMLNode to provide HTML-specific functionality including
+    tag names, attributes, and dynamic child element creation.
 
     Attributes:
-        tag_name (str): имя тега элемента
-        is_single (bool): флаг, указывающий, является ли элемент одиночным (например, <img>)
-        is_text (bool): флаг, указывающий, является ли элемент текстовым
-        _attrs (dict): словарь атрибутов элемента
-        parent (HTML): родительский элемент
-        root (HTML): корневой элемент
-        _nodes (list): список дочерних элементов
+        tag_name (str): Tag name of the element
+        is_single (bool): Flag indicating whether the element is single (e.g., <img>)
+        is_text (bool): Flag indicating whether the element is text
+        _attrs (dict): Dictionary of element attributes
+        parent (HTML): Parent element
+        root (HTML): Root element
+        _nodes (list): List of child elements
 
     """
 
     def __init__(self, tag_name: str, attrs: Optional[dict] = None):
         """
-        Инициализирует экземпляр класса HTML.
+        Initialize an HTML class instance.
 
         Args:
-            tag_name (str): имя тега элемента
-            attrs (dict, optional): словарь атрибутов элемента
+            tag_name (str): Tag name of the element
+            attrs (dict, optional): Dictionary of element attributes
 
         """
         super().__init__()
@@ -211,10 +292,10 @@ class HTML(HTMLNode):
 
     def __repr__(self) -> str:
         """
-        Возвращает строковое представление HTML-элемента.
+        Return string representation of the HTML element.
 
         Returns:
-            str: строковое представление HTML-элемента
+            str: String representation of the HTML element
 
         """
         from .renderer import Renderer
@@ -223,16 +304,16 @@ class HTML(HTMLNode):
 
     def __getattr__(self, tag_name: str) -> Callable:
         """
-        Возвращает функцию, которая создает новый HTML-элемент с указанным именем тега.
+        Return a function that creates a new HTML element with the specified tag name.
         
-        Для тегов, которые конфликтуют с ключевыми словами Python (input, object, map, del),
-        автоматически ищет версию с подчеркиванием (input_, object_, map_, del_).
+        For tags that conflict with Python keywords (input, object, map, del),
+        automatically searches for a version with underscore (input_, object_, map_, del_).
 
         Args:
-            tag_name (str): имя тега
+            tag_name (str): Tag name
 
         Returns:
-            Callable: функция, создающая новый HTML-элемент
+            Callable: Function that creates a new HTML element
 
         """
         from . import tags
@@ -264,10 +345,10 @@ class HTML(HTMLNode):
     @property
     def in_head(self) -> bool:
         """
-        Проверяет, находится ли элемент внутри тега head.
+        Check if the element is inside a head tag.
 
         Returns:
-            bool: True, если элемент находится внутри тега head, иначе False
+            bool: True if the element is inside a head tag, otherwise False
 
         """
         parent = self.parent
@@ -282,10 +363,10 @@ class HTML(HTMLNode):
     @property
     def in_body(self) -> bool:
         """
-        Проверяет, находится ли элемент внутри тега body.
+        Check if the element is inside a body tag.
 
         Returns:
-            bool: True, если элемент находится внутри тега body, иначе False
+            bool: True if the element is inside a body tag, otherwise False
 
         """
         parent = self.parent
@@ -299,13 +380,13 @@ class HTML(HTMLNode):
 
     def add_node_validation(self, new_node: "HTML") -> None:
         """
-        Проверяет, может ли новый HTML-элемент быть добавлен как дочерний элемент.
+        Check if a new HTML element can be added as a child element.
 
         Args:
-            new_node (HTMLNode): новый HTML-элемент
+            new_node (HTMLNode): New HTML element
 
         Raises:
-            Exception: если у нового элемента уже есть родитель
+            Exception: If the new element already has a parent
 
         """
         if new_node.parent:
@@ -313,13 +394,13 @@ class HTML(HTMLNode):
 
     def save(self, filename: str) -> Path:
         """
-        Сохраняет HTML-документ в файл.
+        Save the HTML document to a file.
 
         Args:
-            filename (str): имя файла
+            filename (str): File name
 
         Returns:
-            Path: объект класса Path, представляющий путь к файлу
+            Path: Path object representing the file path
 
         """
         from .renderer import Renderer

@@ -1,5 +1,21 @@
 """
-HTML теги, организованные по логическим модулям.
+HTML tags organized by logical modules.
+
+This module provides a comprehensive collection of HTML5 tags organized into
+logical categories for easy import and use. All tags are implemented as classes
+that inherit from base tag classes and provide proper HTML semantics.
+
+Categories:
+- Base classes and mixins
+- Document structure tags
+- Semantic HTML5 tags
+- Text formatting tags
+- List tags
+- Table tags
+- Form tags
+- Media tags
+- Metadata tags
+- Interactive elements
 """
 
 # Базовые классы и миксины

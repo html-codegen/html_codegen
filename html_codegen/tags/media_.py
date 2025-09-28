@@ -1,5 +1,8 @@
 """
-Медиа теги.
+Media tags.
+
+This module provides HTML tags for embedding and displaying media content,
+including images, videos, audio, and other multimedia elements.
 """
 from .base_ import SingleTag, Tag
 

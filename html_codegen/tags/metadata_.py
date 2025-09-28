@@ -1,5 +1,8 @@
 """
-Метаданные теги.
+Metadata tags.
+
+This module provides HTML tags for document metadata and head section elements,
+including title, meta, link, style, and script tags.
 """
 from pathlib import Path
 from typing import Optional
@@ -14,10 +17,10 @@ class title(OnlyTextTagMixin, Tag):
 
     def __init__(self, text_content: str, /) -> None:
         """
-        Инициализирует объект title тега с заданным текстом.
+        Initialize a title tag object with the given text.
 
-        Параметры:
-            text_content (str): Текст, который будет установлен для этого тега.
+        Args:
+            text_content (str): Text that will be set for this tag.
         """
         super().__init__()
         from .base_ import text
@@ -37,12 +40,12 @@ class link(SingleTag):
 
     def __init__(self, href: str, /, rel: str, **kwargs) -> None:
         """
-        Инициализирует объект link тега с заданными параметрами.
+        Initialize a link tag object with the given parameters.
 
-        Параметры:
-            href (str): URL, на который должен указывать ссылка.
-            rel (str): Отношение между текущим документом и целевым документом.
-            **kwargs: Дополнительные именованные аргументы, которые будут переданы в родительский класс.
+        Args:
+            href (str): URL that the link should point to.
+            rel (str): Relationship between the current document and the target document.
+            **kwargs: Additional keyword arguments that will be passed to the parent class.
         """
         attrs = kwargs.get("attrs", {})
         attrs.update({"href": href, "rel": rel})
@@ -69,12 +72,12 @@ class style(OnlyTextTagMixin, Tag):
         style_type: Optional[str] = None,
     ) -> None:
         """
-        Инициализирует объект style тега с заданным путем к стилю и необязательными медиа и типом стиля.
+        Initialize a style tag object with the given style path and optional media and style type.
 
-        Параметры:
-            style_path (str): Путь к файлу стиля.
-            media (Optional[str]): Медиа, для которых предназначен этот стиль.
-            style_type (Optional[str]): Тип этого стиля.
+        Args:
+            style_path (str): Path to the style file.
+            media (Optional[str]): Media for which this style is intended.
+            style_type (Optional[str]): Type of this style.
         """
         attrs = {}
         if media:
@@ -83,9 +86,11 @@ class style(OnlyTextTagMixin, Tag):
             attrs["type"] = style_type
         super().__init__(attrs)
 
-        self.text(self._get_code(style_path))
+        from .base_ import text
+        self.add_node(text(self._get_code(style_path)))
 
     def _get_code(self, path: str) -> str:
+        """Read and return the contents of a file."""
         with open(Path(path), "r") as file:
             return file.read().strip()
 
@@ -97,11 +102,11 @@ class script(OnlyTextTagMixin, Tag):
 
     def __init__(self, script_path: Optional[str] = None, **kwargs) -> None:
         """
-        Инициализирует объект script тега с заданным путем к скрипту.
+        Initialize a script tag object with the given script path.
 
-        Параметры:
-            script_path (Optional[str]): Путь к файлу скрипта.
-            **kwargs: Дополнительные именованные аргументы, которые будут переданы в родительский класс.
+        Args:
+            script_path (Optional[str]): Path to the script file.
+            **kwargs: Additional keyword arguments that will be passed to the parent class.
         """
         super().__init__(kwargs)
 
@@ -109,6 +114,7 @@ class script(OnlyTextTagMixin, Tag):
             self.text(self._get_code(script_path))
 
     def _get_code(self, path: str) -> str:
+        """Read and return the contents of a file."""
         with open(Path(path), "r") as file:
             return file.read().strip()
 
@@ -126,11 +132,11 @@ class pyscript(OnlyTextTagMixin, Tag):
 
     def __init__(self, module: str, /, **kwargs):
         """
-        Инициализирует объект pyscript тега с заданным модулем Python.
+        Initialize a pyscript tag object with the given Python module.
 
-        Параметры:
-            module (str): Модуль Python, который будет использован в этом теге.
-            **kwargs: Дополнительные именованные аргументы, которые будут переданы в родительский класс.
+        Args:
+            module (str): Python module that will be used in this tag.
+            **kwargs: Additional keyword arguments that will be passed to the parent class.
         """
         attrs = kwargs.pop("attrs", {})
         attrs["type"] = "text/python"
@@ -139,15 +145,22 @@ class pyscript(OnlyTextTagMixin, Tag):
 
         self.text(self._get_module_code(module))
 
-    def parent_setted_callback(self):
-        from .document_ import html
-        if not isinstance(self.root, html) or not self.root.use_brython:
+    def _execute_parent_callback(self):
+        """Validate that Brython is enabled for pyscript tags."""
+        html_tag = self._find_html_tag()
+        
+        if not html_tag or not html_tag.use_brython:
             raise Exception(
-                'Вы не можете использовать "pyscript" тег пока не поставите use_brython=True у "html" тега\n\t'
+                'You cannot use "pyscript" tag until you set use_brython=True for "html" tag\n\t'
                 "example: `document = html(use_brython=True)`"
             )
 
     def _get_module_code(self, module_name: str):
-        module_path = Path(module_name.replace(".", "/") + ".py")
-        with open(module_path, "r") as module_file:
-            return module_file.read().strip()
+        """Read and return the contents of a Python module file."""
+        try:
+            module_path = Path(module_name.replace(".", "/") + ".py")
+            with open(module_path, "r") as module_file:
+                return module_file.read().strip()
+        except FileNotFoundError:
+            # If file doesn't exist, return a placeholder
+            return f"# Module {module_name} not found"

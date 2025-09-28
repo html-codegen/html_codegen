@@ -1,5 +1,8 @@
 """
-Семантические теги HTML5.
+HTML5 semantic tags.
+
+This module provides semantic HTML5 tags that give meaning to the structure
+of web content, making it more accessible and SEO-friendly.
 """
 from .base_ import Tag
 

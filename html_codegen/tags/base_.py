@@ -1,5 +1,9 @@
 """
-Базовые классы и миксины для HTML тегов.
+Base classes and mixins for HTML tags.
+
+This module provides the fundamental building blocks for all HTML tags,
+including base classes, mixins, and utility classes that define common
+behavior and validation rules.
 """
 from operator import attrgetter
 from typing import Optional
@@ -17,33 +21,42 @@ class text(HTML):
 
     def __init__(self, text: str, /) -> None:
         """
-        Инициализирует объект текста с заданным текстом.
+        Initialize a text object with the given text.
 
-        Параметры:
-            text (str): Текст, который будет установлен для этого узла.
+        Args:
+            text (str): Text that will be set for this node.
         """
         super().__init__("", {"text": text})
         self.is_text = True
 
     def add_node_validation(self, new_node: "HTML") -> None:
-        raise Exception("Текст не может иметь вложеных тегов")
+        raise Exception("Text cannot have nested tags")
 
     def __repr__(self):
         return self._attrs["text"]
 
 
 class OnlyOneInHTMLTagMixin:
+    """
+    Mixin class that ensures a tag can only appear once within an HTML document.
+    
+    This mixin validates that the tag is placed inside an HTML tag and that
+    no other instance of the same tag already exists in the document.
+    """
     tag_name: str
     parent: HTML
 
-    def parent_setted_callback(self) -> None:
-        from .document_ import html
-        if not isinstance(self.parent, html):
-            raise Exception(f'Тег "{self.tag_name}" может находиться только внутри тега "html"')
+    def _execute_parent_callback(self) -> None:
+        """Validate that the tag is properly placed within an HTML document."""
+        html_tag = self._find_html_tag()
+        
+        if not html_tag:
+            raise Exception(f'Tag "{self.tag_name}" can only be placed inside an "html" tag')
 
-        parent_children = list(map(attrgetter("tag_name"), self.parent.children))
-        if self.tag_name in parent_children:
-            raise Exception(f'Тег "{self.tag_name}" может быть только один внутри тега "html"')
+        # Проверяем уникальность только среди прямых детей html тега
+        html_children = list(map(attrgetter("tag_name"), html_tag.children))
+        if html_children.count(self.tag_name) > 1:
+            raise Exception(f'Tag "{self.tag_name}" can only appear once inside an "html" tag')
 
 
 class OnlyTextTagMixin:
@@ -58,7 +71,7 @@ class OnlyTextTagMixin:
 
     def add_node_validation(self, new_node: "HTML") -> None:
         if not new_node.is_text:
-            raise Exception(f'Тег "{self.tag_name}" может содержать только текст')
+            raise Exception(f'Tag "{self.tag_name}" can only contain text')
 
 
 class Tag(HTML):
@@ -68,10 +81,10 @@ class Tag(HTML):
 
     def __init__(self, attrs: Optional[dict] = None) -> None:
         """
-        Инициализирует объект тега с заданными атрибутами.
+        Initialize a tag object with the given attributes.
 
-        Параметры:
-            attrs (Optional[dict]): Атрибуты, которые будут установлены для этого тега.
+        Args:
+            attrs (Optional[dict]): Attributes that will be set for this tag.
         """
         super().__init__(self.__class__.__name__, attrs)
 
@@ -86,14 +99,14 @@ class SingleTag(Tag):
 
     def __init__(self, *args, **kwargs) -> None:
         """
-        Инициализирует объект одиночного тега с заданными параметрами.
+        Initialize a single tag object with the given parameters.
 
-        Параметры:
-            *args: Дополнительные позиционные аргументы, которые будут переданы в родительский класс.
-            **kwargs: Дополнительные именованные аргументы, которые будут переданы в родительский класс.
+        Args:
+            *args: Additional positional arguments that will be passed to the parent class.
+            **kwargs: Additional keyword arguments that will be passed to the parent class.
         """
         super().__init__(*args, **kwargs)
         self.is_single = True
 
     def add_node_validation(self, *args) -> None:
-        raise Exception(f'Одиночный тег "{self.tag_name}" не может иметь вложеных тегов')
+        raise Exception(f'Single tag "{self.tag_name}" cannot have nested tags')

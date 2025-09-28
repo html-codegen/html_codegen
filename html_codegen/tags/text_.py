@@ -1,5 +1,8 @@
 """
-Текстовые теги и форматирование.
+Text tags and formatting.
+
+This module provides HTML tags for text content and formatting,
+including headings, paragraphs, emphasis, and other text-related elements.
 """
 from .base_ import Tag
 

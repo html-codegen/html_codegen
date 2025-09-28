@@ -1,5 +1,8 @@
 """
-Теги форм.
+Form tags.
+
+This module provides HTML tags for creating interactive forms,
+including input fields, buttons, labels, and form containers.
 """
 from .base_ import SingleTag, Tag
 

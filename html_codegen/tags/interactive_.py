@@ -1,5 +1,8 @@
 """
-Интерактивные элементы.
+Interactive elements.
+
+This module provides HTML tags for interactive elements,
+including links, buttons, and other user-interactive components.
 """
 from .base_ import SingleTag, Tag
 

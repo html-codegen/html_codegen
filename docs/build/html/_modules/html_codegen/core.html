@@ -1,0 +1,554 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>html_codegen.core &mdash; HTML Codegen 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            HTML Codegen
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Содержание:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Установка</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Быстрый старт</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Примеры использования</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">HTML Codegen</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">html_codegen.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for html_codegen.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Core HTML node classes for creating hierarchical HTML document structures.</span>
+
+<span class="sd">This module contains the HTMLNode and HTML classes for building HTML document trees.</span>
+<span class="sd">HTMLNode represents a tree node, while HTML is an HTML element that inherits from HTMLNode.</span>
+<span class="sd">The code includes methods for adding nodes, determining parent elements and root,</span>
+<span class="sd">as well as saving HTML documents to files.</span>
+
+<span class="sd">The HTMLNode class also implements a context manager that creates code blocks using the with operator.</span>
+<span class="sd">When an HTMLNode instance is created inside a with block, it is added to the context stack</span>
+<span class="sd">of the current execution context. When exiting the with block, all elements of the current context</span>
+<span class="sd">are added as child elements to the current HTMLNode instance if they don&#39;t have a parent element. </span>
+<span class="sd">The HTMLNode context manager allows creating hierarchical element structures in HTML documents using with blocks.</span>
+
+<span class="sd">The HTML class also allows dynamic creation of child elements through method calls with tag names.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_thread_context</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Возвращает идентификатор текущего потока.&quot;&quot;&quot;</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">[</span><span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="HTMLNode">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTMLNode">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HTMLNode</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    HTMLNode - base class for all HTML tree nodes.</span>
+
+<span class="sd">    This class provides the fundamental structure for building hierarchical HTML documents.</span>
+<span class="sd">    It supports context management for clean code organization and thread-safe operations.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _parent (Optional[HTMLNode]): Parent node of the current HTML node.</span>
+<span class="sd">        _nodes (list[HTMLNode]): List of child nodes of the current HTML node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;frame&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">])</span>
+    <span class="n">_with_contexts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">_pending_callbacks</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>  <span class="c1"># thread_id -&gt; list of callbacks</span>
+
+<div class="viewcode-block" id="HTMLNode.__init__">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTMLNode.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HTMLNode</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">HTMLNode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_created_in_with_context</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_to_ctx</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="HTMLNode.__enter__">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTMLNode.__enter__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HTMLNode&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Context manager method for creating HTML nodes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            HTMLNode: HTML node object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">HTMLNode</span><span class="o">.</span><span class="n">_with_contexts</span><span class="p">[</span><span class="n">_get_thread_context</span><span class="p">()]</span>
+        <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">HTMLNode</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">thread_id</span> <span class="o">=</span> <span class="n">_get_thread_context</span><span class="p">()</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">HTMLNode</span><span class="o">.</span><span class="n">_with_contexts</span><span class="p">[</span><span class="n">thread_id</span><span class="p">]</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        
+        <span class="c1"># Сначала устанавливаем всех родителей</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        
+        <span class="c1"># Затем выполняем все отложенные колбэки</span>
+        <span class="n">HTMLNode</span><span class="o">.</span><span class="n">_execute_pending_callbacks</span><span class="p">(</span><span class="n">thread_id</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">HTMLNode</span><span class="o">.</span><span class="n">_with_contexts</span><span class="p">[</span><span class="n">thread_id</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;HTMLNode&quot;</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter method for obtaining the parent node of the current HTML node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[HTMLNode]: Parent node of the current HTML node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span>
+
+    <span class="nd">@parent</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="s2">&quot;HTMLNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter method for setting the parent node of the current HTML node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (HTMLNode): Parent node of the current HTML node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_setted_callback</span><span class="p">()</span>
+
+<div class="viewcode-block" id="HTMLNode.parent_setted_callback">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTMLNode.parent_setted_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parent_setted_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback method called when parent is set.</span>
+<span class="sd">        </span>
+<span class="sd">        If the node was created in a with context, the callback is deferred</span>
+<span class="sd">        until the with block exits. Otherwise, it&#39;s executed immediately.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_created_in_with_context</span><span class="p">:</span>
+            <span class="c1"># Отложить выполнение колбэка до выхода из with блока</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_schedule_deferred_callback</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Выполнить колбэк немедленно</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_execute_parent_callback</span><span class="p">()</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_schedule_deferred_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Schedule a deferred callback for execution after with block exits.&quot;&quot;&quot;</span>
+        <span class="n">thread_id</span> <span class="o">=</span> <span class="n">_get_thread_context</span><span class="p">()</span>
+        <span class="n">HTMLNode</span><span class="o">.</span><span class="n">_pending_callbacks</span><span class="p">[</span><span class="n">thread_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_execute_parent_callback</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_execute_parent_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute the actual parent callback logic.</span>
+<span class="sd">        </span>
+<span class="sd">        Override this method in subclasses to implement specific callback behavior.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_execute_pending_callbacks</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">thread_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute all pending callbacks for the given thread.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            thread_id (int): Thread identifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_pending_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">callback</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Логируем ошибку, но не прерываем выполнение других колбэков</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error executing deferred callback: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Очищаем очередь колбэков для этого потока</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_pending_callbacks</span><span class="p">[</span><span class="n">thread_id</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_thread_context</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Возвращает идентификатор текущего потока.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_get_thread_context</span><span class="p">()</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_html_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Найти html тег в иерархии родителей или в контексте with блоков.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            html: HTML тег или None, если не найден</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.tags.document_</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span>
+        
+        <span class="c1"># Сначала ищем в иерархии родителей</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">while</span> <span class="n">current</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">current</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">parent</span>
+        
+        <span class="c1"># Если не нашли в родителях, ищем в контексте with</span>
+        <span class="n">thread_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_thread_context</span><span class="p">()</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_contexts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">thread_id</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">tag</span>
+        
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">layer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter method for obtaining the level of the current HTML node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Level of the current HTML node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">layer</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="k">return</span> <span class="n">layer</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HTMLNode&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Getter method for obtaining the root node of the current HTML node.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            HTMLNode: Root node of the current HTML node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">while</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">root</span> <span class="o">=</span> <span class="n">parent</span>
+
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="k">return</span> <span class="n">root</span>
+
+<div class="viewcode-block" id="HTMLNode.add_node_validation">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTMLNode.add_node_validation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_node_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_node</span><span class="p">:</span> <span class="s2">&quot;HTMLNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for validating a child node before adding it to the current HTML node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_node (HTMLNode): New child node to validate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+
+
+<div class="viewcode-block" id="HTMLNode.add_node">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTMLNode.add_node">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_node</span><span class="p">:</span> <span class="s2">&quot;HTMLNode&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for adding a child node to the current HTML node.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_node (HTMLNode): New child node to add.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_node_validation</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
+        <span class="n">new_node</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_to_ctx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for adding a node to the current context.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">HTMLNode</span><span class="o">.</span><span class="n">_with_contexts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_get_thread_context</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">stack</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_created_in_with_context</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="HTML">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTML">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HTML</span><span class="p">(</span><span class="n">HTMLNode</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    HTML - class representing an HTML element.</span>
+
+<span class="sd">    This class extends HTMLNode to provide HTML-specific functionality including</span>
+<span class="sd">    tag names, attributes, and dynamic child element creation.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        tag_name (str): Tag name of the element</span>
+<span class="sd">        is_single (bool): Flag indicating whether the element is single (e.g., &lt;img&gt;)</span>
+<span class="sd">        is_text (bool): Flag indicating whether the element is text</span>
+<span class="sd">        _attrs (dict): Dictionary of element attributes</span>
+<span class="sd">        parent (HTML): Parent element</span>
+<span class="sd">        root (HTML): Root element</span>
+<span class="sd">        _nodes (list): List of child elements</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HTML.__init__">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTML.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attrs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize an HTML class instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tag_name (str): Tag name of the element</span>
+<span class="sd">            attrs (dict, optional): Dictionary of element attributes</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_name</span> <span class="o">=</span> <span class="n">tag_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attrs</span> <span class="o">=</span> <span class="n">attrs</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;HTML&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span> <span class="s2">&quot;HTML&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;HTML&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="HTML.__repr__">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTML.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return string representation of the HTML element.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: String representation of the HTML element</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+
+        <span class="k">return</span> <span class="n">Renderer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_open_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="n">Renderer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_close_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="HTML.__getattr__">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTML.__getattr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a function that creates a new HTML element with the specified tag name.</span>
+<span class="sd">        </span>
+<span class="sd">        For tags that conflict with Python keywords (input, object, map, del),</span>
+<span class="sd">        automatically searches for a version with underscore (input_, object_, map_, del_).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tag_name (str): Tag name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Callable: Function that creates a new HTML element</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">tags</span>
+
+        <span class="c1"># Список тегов, которые конфликтуют с ключевыми словами Python</span>
+        <span class="n">keyword_conflicts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;del&#39;</span><span class="p">}</span>
+        
+        <span class="c1"># Если тег конфликтует с ключевым словом, ищем версию с подчеркиванием</span>
+        <span class="k">if</span> <span class="n">tag_name</span> <span class="ow">in</span> <span class="n">keyword_conflicts</span><span class="p">:</span>
+            <span class="n">tag_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tag_name</span><span class="si">}</span><span class="s2">_&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_create_node</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;HTML&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tag_class</span><span class="p">:</span>
+                <span class="n">tag</span> <span class="o">=</span> <span class="n">tag_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tag</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">tag</span>
+
+        <span class="k">return</span> <span class="n">_create_node</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">children</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;HTML&quot;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">in_head</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the element is inside a head tag.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the element is inside a head tag, otherwise False</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">while</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent</span><span class="o">.</span><span class="n">tag_name</span> <span class="o">==</span> <span class="s2">&quot;head&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">in_body</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the element is inside a body tag.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the element is inside a body tag, otherwise False</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">while</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent</span><span class="o">.</span><span class="n">tag_name</span> <span class="o">==</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="HTML.add_node_validation">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTML.add_node_validation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_node_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_node</span><span class="p">:</span> <span class="s2">&quot;HTML&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a new HTML element can be added as a child element.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_node (HTMLNode): New HTML element</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the new element already has a parent</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">new_node</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;node already has parent&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HTML.save">
+<a class="viewcode-back" href="../../api.html#html_codegen.core.HTML.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the HTML document to a file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): File name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Path: Path object representing the file path</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Renderer</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">html_path</span> <span class="o">:=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+            <span class="n">html_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;index.html&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">html_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">html_file</span><span class="p">:</span>
+            <span class="n">html_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Renderer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">html_path</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, HTML CodegenTeam.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

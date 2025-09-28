@@ -1,5 +1,8 @@
 """
-Теги таблиц.
+Table tags.
+
+This module provides HTML tags for creating structured tables,
+including table headers, rows, cells, and table containers.
 """
 from .base_ import Tag
 
