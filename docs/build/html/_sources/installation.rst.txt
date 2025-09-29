@@ -86,7 +86,7 @@ HTML Codegen можно установить несколькими способ
        with head():
            title("Тест")
        with body():
-           div().p("Установка прошла успешно!")
+           div().p().text("Установка прошла успешно!")
    
    print(doc.render())
 

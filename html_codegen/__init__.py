@@ -19,7 +19,7 @@ Example:
         with head():
             title("My Page")
         with body():
-            div().p("Hello, World!")
+            div().p().text("Hello, World!")
 
 The library is organized into several modules:
 - core: Base HTML node classes and document structure
