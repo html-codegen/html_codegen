@@ -1,0 +1,53 @@
+stages:
+  - lint
+  - test
+  - docs
+
+variables:
+  PYTHON_VERSION: "3.12"
+  UV_SYSTEM_PYTHON: "1"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .venv/
+
+.python:
+  image: python:3.12-slim
+  before_script:
+    - pip install uv
+    - uv sync --group dev
+
+lint:
+  extends: .python
+  stage: lint
+  script:
+    - uv run ruff check .
+  allow_failure: false
+
+format:
+  extends: .python
+  stage: lint
+  script:
+    - uv run black --check .
+    - uv run isort --check .
+  allow_failure: false
+
+test:
+  extends: .python
+  stage: test
+  script:
+    - uv run pytest -v --cov=html_codegen --cov-report=term-missing
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  allow_failure: false
+
+docs:
+  extends: .python
+  stage: docs
+  script:
+    - uv run sphinx-build -b html docs/source docs/build
+  artifacts:
+    paths:
+      - docs/build/
+    expire_in: 1 week
+  allow_failure: true
