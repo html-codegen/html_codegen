@@ -3,3 +3,4 @@ __pycache__
 venv
 .cursor
 custom_modes
+html_codegen.egg-info/
