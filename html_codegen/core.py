@@ -17,11 +17,15 @@ The HTML class also allows dynamic creation of child elements through method cal
 import threading
 from collections import defaultdict, namedtuple
 from pathlib import Path
-from typing import Callable, Optional
+from typing import TYPE_CHECKING, Callable, Optional
+
+from .exceptions import NodeAlreadyHasParentError
+
+if TYPE_CHECKING:
+    from .tags.document_ import html
 
 
-def _get_thread_context():
-    """Возвращает идентификатор текущего потока."""
+def _get_thread_context() -> int:
     context = [threading.current_thread()]
     return hash(tuple(context))
 
@@ -101,31 +105,17 @@ class HTMLNode:
         self._parent = value
         self.parent_setted_callback()
 
-    def parent_setted_callback(self):
-        """
-        Callback method called when parent is set.
-        
-        If the node was created in a with context, the callback is deferred
-        until the with block exits. Otherwise, it's executed immediately.
-        """
+    def parent_setted_callback(self) -> None:
         if self._created_in_with_context:
-            # Отложить выполнение колбэка до выхода из with блока
             self._schedule_deferred_callback()
         else:
-            # Выполнить колбэк немедленно
             self._execute_parent_callback()
     
-    def _schedule_deferred_callback(self):
-        """Schedule a deferred callback for execution after with block exits."""
+    def _schedule_deferred_callback(self) -> None:
         thread_id = _get_thread_context()
         HTMLNode._pending_callbacks[thread_id].append(self._execute_parent_callback)
     
-    def _execute_parent_callback(self):
-        """
-        Execute the actual parent callback logic.
-        
-        Override this method in subclasses to implement specific callback behavior.
-        """
+    def _execute_parent_callback(self) -> None:
         pass
     
     @classmethod
@@ -148,31 +138,20 @@ class HTMLNode:
         cls._pending_callbacks[thread_id].clear()
     
     @staticmethod
-    def _get_thread_context():
-        """Возвращает идентификатор текущего потока."""
+    def _get_thread_context() -> int:
         return _get_thread_context()
     
-    def _find_html_tag(self):
-        """
-        Найти html тег в иерархии родителей или в контексте with блоков.
-        
-        Returns:
-            html: HTML тег или None, если не найден
-        """
-        from .tags.document_ import html
-        
-        # Сначала ищем в иерархии родителей
+    def _find_html_tag(self) -> Optional["HTML"]:
         current = self.parent
         while current:
-            if isinstance(current, html):
+            if getattr(current, 'tag_name', None) == 'html':
                 return current
             current = current.parent
         
-        # Если не нашли в родителях, ищем в контексте with
         thread_id = self._get_thread_context()
         stack = self._with_contexts.get(thread_id, [])
         for frame in stack:
-            if isinstance(frame.tag, html):
+            if getattr(frame.tag, 'tag_name', None) == 'html':
                 return frame.tag
         
         return None
@@ -302,26 +281,11 @@ class HTML(HTMLNode):
 
         return Renderer(self).get_open_tag(self).strip() + Renderer(self).get_close_tag(self).strip()
 
-    def __getattr__(self, tag_name: str) -> Callable:
-        """
-        Return a function that creates a new HTML element with the specified tag name.
-        
-        For tags that conflict with Python keywords (input, object, map, del),
-        automatically searches for a version with underscore (input_, object_, map_, del_).
-
-        Args:
-            tag_name (str): Tag name
-
-        Returns:
-            Callable: Function that creates a new HTML element
-
-        """
+    def __getattr__(self, tag_name: str) -> Callable[..., "HTML"]:
         from . import tags
 
-        # Список тегов, которые конфликтуют с ключевыми словами Python
         keyword_conflicts = {'input', 'object', 'map', 'del'}
         
-        # Если тег конфликтует с ключевым словом, ищем версию с подчеркиванием
         if tag_name in keyword_conflicts:
             tag_class = getattr(tags, f"{tag_name}_", None)
         else:
@@ -379,18 +343,8 @@ class HTML(HTMLNode):
         return False
 
     def add_node_validation(self, new_node: "HTML") -> None:
-        """
-        Check if a new HTML element can be added as a child element.
-
-        Args:
-            new_node (HTMLNode): New HTML element
-
-        Raises:
-            Exception: If the new element already has a parent
-
-        """
         if new_node.parent:
-            raise Exception("node already has parent")
+            raise NodeAlreadyHasParentError("node already has parent")
 
     def save(self, filename: str) -> Path:
         """
